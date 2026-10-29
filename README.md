@@ -4,6 +4,12 @@ An Android app for looking up Shell carrier contacts on the go and building emai
 
 ## Install on your phone
 
+### iPhone (or any browser)
+
+Open **https://histscot.github.io/Contact_Dashboard/** in Safari, tap **Share → Add to Home Screen**, then open it from the new icon and upload the contact list under **Update**. It works offline after the first visit.
+
+### Android
+
 1. On your Android phone, open this repo's **[Releases](../../releases/latest)** page.
 2. Under **Assets**, tap `GaspariTransportContacts-1.0.N.apk` to download it.
 3. Open the download. The first time, Android asks you to allow your browser to install unknown apps. Allow it, then tap **Install**.
