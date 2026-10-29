@@ -134,7 +134,7 @@ mark.hl.yellow{background:#ffe766} mark.hl.red{background:#ffc9c5} mark.hl.purpl
 .result details[open] summary::before{transform:rotate(90deg)}
 .cl-tools{display:grid;grid-template-columns:auto auto 1fr;gap:8px;margin:6px 0 8px}
 .cl-tools .btn{min-height:44px;padding:0 14px;font-size:15px}
-.cl-tools input{min-width:0;height:44px;border:1.5px solid #c9d1dc;border-radius:12px;padding:0 12px;font-size:15px}
+.cl-tools input{min-width:0;height:44px;border:1.5px solid #c9d1dc;border-radius:12px;padding:0 12px;font-size:16px}
 .cl-row{display:flex;align-items:center;gap:12px;min-height:52px;border-top:1px solid #eef0f3;padding:4px 2px}
 .cl-row input{width:24px;height:24px;flex:none;accent-color:var(--navy)}
 .cl-row .nm{flex:1;min-width:0;font-size:15px}
@@ -145,7 +145,7 @@ mark.hl.yellow{background:#ffe766} mark.hl.red{background:#ffc9c5} mark.hl.purpl
 .h2{font-size:17px;margin:0 0 10px}
 .hint{font-size:14px;color:var(--muted);margin:10px 0 0}
 .small{font-size:14px;color:var(--muted)}
-.data-info{font-size:15px;margin-bottom:12px}
+.data-info{font-size:15px;margin-bottom:12px;overflow-wrap:anywhere}
 .data-info b{font-size:17px}
 .sumgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
 .sum{background:#f4f6f9;border-radius:12px;padding:10px 12px}

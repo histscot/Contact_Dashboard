@@ -378,6 +378,19 @@ function applyData(payload){
   setTop();
 }
 
+/* ---------- web (home-screen) version extras ---------- */
+const isNativeApp = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+if(!isNativeApp){
+  if('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')){
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  // Ask the browser not to clear the stored contact list when space runs low.
+  if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  const standalone = window.navigator.standalone === true || (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+  const iOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  $('a2hs').hidden = !(iOS && !standalone);
+}
+
 /* ---------- init ---------- */
 applyData(store.get(STORE_KEY));
 history.replaceState({}, '', location.pathname + location.search);

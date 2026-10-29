@@ -1,0 +1,40 @@
+name: Publish web app (GitHub Pages)
+
+# Publishes www/ so the app can be opened in Safari (iPhone) or any browser and added to the
+# Home Screen. Contains no contact data — the spreadsheet is loaded on the device.
+
+on:
+  push:
+    branches: [main]
+    paths: ['www/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Stamp offline cache version
+        run: sed -i "s/__BUILD__/${GITHUB_SHA::12}/" www/sw.js
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: www
+
+      - id: deployment
+        uses: actions/deploy-pages@v4
