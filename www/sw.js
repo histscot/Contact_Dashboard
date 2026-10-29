@@ -4,7 +4,7 @@
 const VERSION = '__BUILD__';
 const CACHE = 'gtc-' + VERSION;
 const FILES = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/contacts-data.js', 'manifest.webmanifest',
-               'favicon.png', 'img/logo-192.png', 'img/icon-512.png', 'img/apple-touch-icon.png'];
+               'favicon.png', 'img/logo-192.png', 'img/icon-192.png', 'img/icon-512.png', 'img/apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
