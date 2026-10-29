@@ -55,9 +55,21 @@ jobs:
         env:
           KS: ${{ secrets.ANDROID_DEBUG_KEYSTORE_B64 }}
         run: |
-          mkdir -p ~/.android
           if [ -n "$KS" ]; then
-            echo "$KS" | base64 -d > ~/.android/debug.keystore
+            echo "$KS" | tr -d ' \r\n' | base64 -d > "$RUNNER_TEMP/ci-debug.keystore"
+            keytool -list -keystore "$RUNNER_TEMP/ci-debug.keystore" -storepass android -alias androiddebugkey > /dev/null \
+              || { echo "::error::ANDROID_DEBUG_KEYSTORE_B64 is not a valid keystore (alias androiddebugkey, password android)"; exit 1; }
+            echo "CI_KEYSTORE=$RUNNER_TEMP/ci-debug.keystore" >> "$GITHUB_ENV"
+            # Point the debug signing config at the saved key explicitly.
+            cat >> android/app/build.gradle <<'GRADLE'
+
+          if (System.getenv("CI_KEYSTORE")) {
+              android.signingConfigs.debug.storeFile = file(System.getenv("CI_KEYSTORE"))
+              android.signingConfigs.debug.storePassword = "android"
+              android.signingConfigs.debug.keyAlias = "androiddebugkey"
+              android.signingConfigs.debug.keyPassword = "android"
+          }
+          GRADLE
             echo "Using saved signing key"
           else
             echo "::warning::No ANDROID_DEBUG_KEYSTORE_B64 secret — this build is signed with a new key, so uninstall the old app before installing it."
@@ -74,6 +86,15 @@ jobs:
           mkdir -p dist
           cp android/app/build/outputs/apk/debug/app-debug.apk "dist/GaspariTransportContacts-1.0.${{ github.run_number }}.apk"
           ls -la dist
+
+      - name: Check APK is signed with the saved key
+        if: env.CI_KEYSTORE != ''
+        run: |
+          want=$(keytool -list -v -keystore "$CI_KEYSTORE" -storepass android -alias androiddebugkey | grep -m1 'SHA256:' | awk '{print $2}')
+          got=$(keytool -printcert -jarfile dist/*.apk | grep -m1 'SHA256:' | awk '{print $2}')
+          echo "saved key: $want"; echo "APK:       $got"
+          [ "$want" = "$got" ] || { echo "::error::APK is not signed with the saved key"; exit 1; }
+          echo "::notice::APK signed with the saved key ($got)"
 
       - uses: actions/upload-artifact@v4
         with:
