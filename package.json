@@ -1,0 +1,19 @@
+{
+  "name": "gaspari-transport-contacts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Phone app for looking up Shell carrier contacts and building email distribution lists from the master contact .xlsx.",
+  "scripts": {
+    "serve": "npx http-server www -p 8080 -c-1",
+    "android:prepare": "cap add android && capacitor-assets generate --android && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "7.6.9",
+    "@capacitor/clipboard": "7.0.4",
+    "@capacitor/core": "7.6.9"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "7.6.9"
+  }
+}

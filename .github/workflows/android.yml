@@ -1,0 +1,90 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create Android project
+        run: npx cap add android
+
+      - name: App icon + splash screen from assets/
+        run: npx capacitor-assets generate --android --iconBackgroundColor '#131927' --iconBackgroundColorDark '#131927' --splashBackgroundColor '#131927' --splashBackgroundColorDark '#131927'
+
+      - name: Sync web app into Android project
+        run: npx cap sync android
+
+      - name: Set version
+        run: |
+          sed -i "s/versionCode 1$/versionCode ${{ github.run_number }}/" android/app/build.gradle
+          sed -i "s/versionName \"1.0\"/versionName \"1.0.${{ github.run_number }}\"/" android/app/build.gradle
+          grep -n "versionCode\|versionName" android/app/build.gradle
+
+      # Same signing key every build lets new versions install over old ones.
+      # Optional: add repo secret ANDROID_DEBUG_KEYSTORE_B64 (base64 of a debug.keystore,
+      # alias androiddebugkey, passwords "android"). Without it, each build gets a new key.
+      - name: Signing key
+        env:
+          KS: ${{ secrets.ANDROID_DEBUG_KEYSTORE_B64 }}
+        run: |
+          mkdir -p ~/.android
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > ~/.android/debug.keystore
+            echo "Using saved signing key"
+          else
+            echo "::warning::No ANDROID_DEBUG_KEYSTORE_B64 secret — this build is signed with a new key, so uninstall the old app before installing it."
+          fi
+
+      - name: Build APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Name the APK
+        run: |
+          mkdir -p dist
+          cp android/app/build/outputs/apk/debug/app-debug.apk "dist/GaspariTransportContacts-1.0.${{ github.run_number }}.apk"
+          ls -la dist
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GaspariTransportContacts-1.0.${{ github.run_number }}
+          path: dist/*.apk
+
+      - name: Publish release (download link for your phone)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v1.0.${{ github.run_number }}" dist/*.apk \
+            --title "Gaspari Transport Contacts 1.0.${{ github.run_number }}" \
+            --notes "Open this page on your Android phone, tap the .apk under Assets to download, then open it to install. First time: allow your browser to install unknown apps when asked. After installing, open the app, go to Update, and upload the Shell Carrier Contact List .xlsx." \
+            --latest

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#14213d">
+<title>Gaspari Transport Contacts</title>
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-row">
+    <button class="icon-btn" id="backBtn" aria-label="Back to carrier list" hidden>‹</button>
+    <img class="top-logo" id="topLogo" src="img/logo-192.png" alt="">
+    <div class="top-titles">
+      <h1 id="topTitle">Gaspari Transport Contacts</h1>
+      <div class="top-sub" id="topSub"></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ============ LOOKUP ============ -->
+  <section class="view on" id="v-lookup">
+    <div id="lookupList">
+      <div class="search-wrap">
+        <input type="search" id="q" placeholder="Search carrier name or SCAC" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="search">
+        <button class="clear-q" id="clearQ" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="chips scroll-x" id="capChips" role="group" aria-label="Capability">
+        <button class="chip on" data-v="All">All</button><button class="chip" data-v="Pack">Pack</button><button class="chip" data-v="Bulk">Bulk</button><button class="chip" data-v="Both">Both</button>
+      </div>
+      <div id="recentWrap" hidden>
+        <div class="sec-label">Recent</div>
+        <div class="chips scroll-x" id="recent"></div>
+      </div>
+      <div class="sec-label" id="listLabel">All carriers</div>
+      <div class="carrier-list" id="carrierList"></div>
+    </div>
+
+    <div id="carrierDetail" hidden></div>
+  </section>
+
+  <!-- ============ DISTROS ============ -->
+  <section class="view" id="v-distro">
+    <div class="seg" id="distroMode">
+      <button class="on" data-v="cap">By capability</button>
+      <button data-v="type">By service type</button>
+    </div>
+    <div class="panel" id="capPanel">
+      <div class="sec-label">Capability</div>
+      <div class="chips" id="dCap">
+        <button class="chip on" data-v="Pack">Pack</button><button class="chip" data-v="Bulk">Bulk</button><button class="chip" data-v="Both">Both only</button><button class="chip" data-v="All">All</button>
+      </div>
+      <label class="switch-row"><input type="checkbox" id="dIncBoth" checked><span>Include “Both” carriers in Pack / Bulk</span></label>
+    </div>
+    <div class="panel" id="typePanel" hidden>
+      <div class="sec-label">Service type <span class="muted">(pick one or more)</span></div>
+      <div class="chips wrap" id="dTypes"></div>
+      <div class="sec-label" style="margin-top:14px">Capability</div>
+      <div class="chips" id="dTypeCap">
+        <button class="chip on" data-v="All">All</button><button class="chip" data-v="Pack">Pack</button><button class="chip" data-v="Bulk">Bulk</button><button class="chip" data-v="Both">Both only</button>
+      </div>
+    </div>
+    <div class="panel result" id="distroOut"></div>
+  </section>
+
+  <!-- ============ UPDATE ============ -->
+  <section class="view" id="v-update">
+    <div class="panel">
+      <h2 class="h2">Contact list</h2>
+      <div id="dataInfo" class="data-info"></div>
+      <label class="btn big primary file-btn">
+        <span>Upload contact list (.xlsx)</span>
+        <input type="file" id="fileIn" hidden>
+      </label>
+      <p class="hint">Pick the latest <b>Shell Carrier Contact List</b> Excel file from your phone (Downloads, Drive, OneDrive, an email attachment you saved…). It's read on this phone only — nothing is uploaded anywhere. Crossed-out carriers and contacts are left out automatically.</p>
+    </div>
+    <div id="updateSummary"></div>
+    <div class="panel" id="excludedPanel" hidden>
+      <h2 class="h2">Left out (crossed out in the file)</h2>
+      <div id="excludedList" class="small"></div>
+    </div>
+    <div class="panel">
+      <h2 class="h2">Remove data from this phone</h2>
+      <p class="hint">Deletes the stored contact list from the app. You can upload it again any time.</p>
+      <button class="btn ghost danger" id="clearData">Remove contact data</button>
+    </div>
+  </section>
+</main>
+
+<nav class="tabbar" id="tabbar">
+  <button class="tab on" data-v="lookup"><span class="ti">⌕</span><span>Lookup</span></button>
+  <button class="tab" data-v="distro"><span class="ti">✉</span><span>Distros</span></button>
+  <button class="tab" data-v="update"><span class="ti">⇪</span><span>Update</span></button>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/contacts-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

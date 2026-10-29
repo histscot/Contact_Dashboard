@@ -1,0 +1,10 @@
+node_modules/
+android/
+ios/
+*.apk
+*.keystore
+*.jks
+# Contact data never goes in this public repo — load it in the app instead.
+*.xlsx
+*.xls
+*.csv

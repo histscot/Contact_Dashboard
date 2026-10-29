@@ -1,0 +1,8 @@
+{
+  "appId": "com.gaspari.transportcontacts",
+  "appName": "Gaspari Transport Contacts",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#131927"
+  }
+}
