@@ -51,6 +51,7 @@
 
   <!-- ============ DISTROS ============ -->
   <section class="view" id="v-distro">
+    <div class="step-h"><span class="step-n">1</span>Start with</div>
     <div class="seg" id="distroMode">
       <button class="on" data-v="cap">By capability</button>
       <button data-v="type">By service type</button>
@@ -70,7 +71,18 @@
         <button class="chip on" data-v="All">All</button><button class="chip" data-v="Pack">Pack</button><button class="chip" data-v="Bulk">Bulk</button><button class="chip" data-v="Both">Both only</button>
       </div>
     </div>
+    <div class="step-h"><span class="step-n">2</span>Then add from those same carriers <span class="muted">(optional)</span></div>
+    <div class="panel" id="step2Panel">
+      <div class="hint" id="step2Note" style="margin:0 0 10px"></div>
+      <div class="chips wrap" id="dAdd"></div>
+      <label class="switch-row"><input type="checkbox" id="dKeep1" checked><span>Keep the step 1 contacts in the list</span></label>
+    </div>
+    <div class="step-h"><span class="step-n">3</span>Copy your list</div>
     <div class="panel result" id="distroOut"></div>
+    <div class="float-copy" id="dFloat">
+      <span class="fc-count" id="dFloatCount"></span>
+      <button class="btn copy-all" id="dFloatCopy">📋 Copy</button>
+    </div>
   </section>
 
   <!-- ============ UPDATE ============ -->

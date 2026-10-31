@@ -23,7 +23,11 @@ Every push to `main` builds a new APK automatically (**Actions → Build Android
   - a big **Copy emails** button (semicolon-separated, ready to paste into Outlook) and an **Email** button
   - a **Copy** button next to every email address and a **Call** button for every phone number
   - service-type filter chips
-- **Distros**: email lists by service capability (Pack / Bulk / Both) or by service type (for example Driver Check-in or Safety). Use **Choose carriers → Clear** to pick only a few carriers.
+  - a checkbox next to every email address: tick the ones you want and the big button copies **only those** (**Select all shown** works with the service-type filter, so you can tick Safety contacts, switch to Escalation and add more)
+- **Distros**: build an email list in steps:
+  1. **Start with** a service capability (Pack / Bulk / Both) or service types (for example Driver Check-in). The carriers this finds become your carrier base.
+  2. **Then add from those same carriers**: tick more service types (for example Escalation Contact or Safety) to add those contacts at only those carriers. Untick **Keep the step 1 contacts** to get just the added ones.
+  3. **Copy your list**: the pinned **Copy** bar is always on screen. Use **Choose carriers → Clear** to pick only a few carriers.
 - **Update**: upload the latest `.xlsx`. The summary shows how many rows have Service Type filled in compared with the last upload, plus any carriers newly crossed out, back in, added or removed.
 
 Highlights: yellow = driver check-in, red = safety / quality / claims, purple = bulk planning.

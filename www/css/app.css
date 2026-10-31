@@ -78,6 +78,14 @@ main{padding:14px 14px calc(var(--tabbar-h) + var(--safe-bottom) + 24px);max-wid
 .flag.untagged{background:#fffbe6;border-style:dashed}
 
 .action-bar{position:sticky;top:calc(66px + var(--safe-top));z-index:10;background:var(--bg);padding:10px 0;display:grid;grid-template-columns:1fr auto;gap:8px}
+.pick-bar{grid-column:1 / -1;display:flex;align-items:center;gap:8px}
+.pick-btn{min-height:42px;padding:0 12px;font-size:14px;border-width:1.5px;border-radius:12px}
+.pick-count{flex:1;font-size:13px;color:var(--muted);text-align:center}
+.btn.copy-all.has-pick{background:var(--navy);border-color:var(--navy);color:#fff}
+.pick-l{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+.pick-l input{flex:none;width:26px;height:26px;margin:0;accent-color:var(--navy)}
+.pick-l .val{color:var(--ink)}
+.line.picked{background:#e8eef9;border-radius:10px;margin-left:-6px;margin-right:-6px;padding-left:6px;padding-right:6px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 18px;border-radius:14px;border:2px solid var(--accent);background:var(--accent);color:#fff;font-size:16px;font-weight:700;text-decoration:none;text-align:center}
 .btn:active{transform:scale(.98);filter:brightness(.92)}
 .btn.big{min-height:58px;font-size:17px;width:100%}
@@ -161,5 +169,18 @@ mark.hl.yellow{background:#ffe766} mark.hl.red{background:#ffc9c5} mark.hl.purpl
 .tab .ti{font-size:22px;line-height:1}
 .tab.on{color:var(--navy)}
 .tab.on .ti{color:var(--accent)}
-.toast{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + var(--safe-bottom) + 16px);transform:translate(-50%,20px);background:#1b2430;color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;opacity:0;pointer-events:none;transition:all .2s;z-index:40;max-width:calc(100% - 32px);text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(var(--tabbar-h) + var(--safe-bottom) + 92px);transform:translate(-50%,20px);background:#1b2430;color:#fff;padding:12px 18px;border-radius:12px;font-weight:600;font-size:15px;opacity:0;pointer-events:none;transition:all .2s;z-index:40;max-width:calc(100% - 32px);text-align:center}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* distro steps */
+.step-h{display:flex;align-items:center;gap:10px;font-weight:750;font-size:16px;margin:16px 2px 8px}
+.step-h:first-child{margin-top:2px}
+.step-n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--navy);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px}
+.chip.empty{opacity:.45}
+.breakdown{font-size:13px;color:var(--muted);margin-top:2px}
+.float-copy{position:fixed;left:0;right:0;bottom:calc(var(--tabbar-h) + var(--safe-bottom));z-index:25;display:flex;align-items:center;gap:12px;padding:10px 14px;background:rgba(255,255,255,.97);border-top:1px solid var(--line);box-shadow:0 -4px 12px rgba(20,33,61,.08)}
+.float-copy .fc-count{flex:1;font-size:13px;color:var(--muted);line-height:1.25}
+.float-copy .fc-count b{font-size:18px;color:var(--ink)}
+.float-copy .btn{min-height:50px;padding:0 22px}
+#v-distro{padding-bottom:84px}
+#v-distro:not(.on) .float-copy{display:none}

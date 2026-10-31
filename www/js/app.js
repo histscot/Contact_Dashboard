@@ -33,6 +33,7 @@ function markText(s){
 /* ---------- state ---------- */
 let DATA = [], META = {}, PAYLOAD = null;
 let capFilter = 'All', current = null, detailType = null;
+let picked = new Set();   // emails ticked on the carrier screen (lower-case)
 
 /* ---------- copy + toast ---------- */
 let toastTimer;
@@ -136,7 +137,7 @@ function renderList(){
 function openCarrier(scac, fromHistory){
   const c = DATA.find(x => x.scac === scac);
   if(!c) return;
-  current = c; detailType = null;
+  current = c; detailType = null; picked = new Set();
   const r = (store.get(RECENT_KEY) || []).filter(s => s !== scac); r.unshift(scac); store.set(RECENT_KEY, r.slice(0, 6));
   if(!fromHistory) history.pushState({c: scac}, '', '#c=' + encodeURIComponent(scac));
   showTab('lookup');
@@ -180,8 +181,13 @@ function renderDetail(){
     <div class="legend">${FLAGS.filter(f => fcount[f.key]).map(f => `<span class="flag ${FLAG_CLASS[f.key]}">${esc(f.label)} · ${fcount[f.key]}${f.key === 'checkin' && untagged ? ` (${untagged} not tagged)` : ''}</span>`).join('')}</div>
   </div>
   <div class="action-bar">
-    <button class="btn copy-all" id="copyAll" ${emails.length ? '' : 'disabled'}>📋 Copy ${plural(emails.length, 'email')}${detailType ? ' shown' : ''}</button>
-    <a class="btn mail-all" id="mailAll" ${emails.length ? `href="${esc(mailto(emails))}"` : 'aria-disabled="true"'}>✉ Email</a>
+    <button class="btn copy-all" id="copyAll"></button>
+    <a class="btn mail-all" id="mailAll">✉ Email</a>
+    <div class="pick-bar">
+      <button class="btn ghost pick-btn" id="pickShown">☑ Select all shown</button>
+      <span class="pick-count" id="pickCount"></span>
+      <button class="btn ghost pick-btn" id="pickClear" hidden>Clear</button>
+    </div>
   </div>
   <div class="chips scroll-x type-filter" id="typeChips">
     <button class="chip ${detailType ? '' : 'on'}" data-t="">All<span class="n">${c.contacts.length}</span></button>
@@ -190,7 +196,29 @@ function renderDetail(){
   ${detailType ? `<div class="filter-note">Showing ${plural(shown.length, 'contact')} tagged “${esc(detailType)}”. Tap <b>All</b> to see everyone.</div>` : ''}
   <div class="cards">${shown.map(card).join('')}</div>`;
 
-  $('copyAll').onclick = () => copyText(emails.join('; '), `Copied ${plural(emails.length, 'email')} — paste into Outlook`);
+  const shownEmails = emails;
+  const updateActions = () => {
+    const sel = [...picked];
+    const list = sel.length ? sel : shownEmails;
+    const cb = $('copyAll'), mb = $('mailAll');
+    cb.disabled = !list.length;
+    cb.textContent = sel.length ? `📋 Copy ${sel.length} selected` : `📋 Copy ${plural(shownEmails.length, 'email')}${detailType ? ' shown' : ''}`;
+    cb.classList.toggle('has-pick', !!sel.length);
+    cb.onclick = () => copyText(list.join('; '), `Copied ${plural(list.length, 'email')} — paste into Outlook`);
+    if(list.length) mb.setAttribute('href', mailto(list)); else mb.removeAttribute('href');
+    $('pickCount').textContent = sel.length ? `${sel.length} selected` : 'Tick emails to copy only those';
+    $('pickClear').hidden = !sel.length;
+    const allShownPicked = shownEmails.length && shownEmails.every(e => picked.has(e));
+    $('pickShown').textContent = allShownPicked ? '☐ Unselect shown' : '☑ Select all shown';
+    box.querySelectorAll('input[data-pick]').forEach(i => { i.checked = picked.has(i.dataset.pick); i.closest('.line').classList.toggle('picked', i.checked); });
+  };
+  box.querySelectorAll('input[data-pick]').forEach(i => i.onchange = () => { i.checked ? picked.add(i.dataset.pick) : picked.delete(i.dataset.pick); updateActions(); });
+  $('pickShown').onclick = () => {
+    const allShownPicked = shownEmails.every(e => picked.has(e));
+    shownEmails.forEach(e => allShownPicked ? picked.delete(e) : picked.add(e)); updateActions();
+  };
+  $('pickClear').onclick = () => { picked.clear(); updateActions(); };
+  updateActions();
   box.querySelectorAll('#typeChips .chip').forEach(b => b.onclick = () => {
     detailType = b.dataset.t || null; const y = window.scrollY; renderDetail(); window.scrollTo(0, y);
   });
@@ -218,7 +246,7 @@ function card(x){
     ${x.loc ? `<div class="k-loc">${esc(x.loc)}</div>` : ''}
     ${x.t ? `<div class="k-title">${markText(x.t)}</div>` : ''}
     <div class="k-types">${types}</div>
-    ${x.e.map(e => `<div class="line"><a class="val" href="mailto:${esc(e)}">${esc(e)}</a><button class="mini copy" data-copy="${esc(e)}">Copy</button></div>`).join('')}
+    ${x.e.map(e => `<div class="line"><label class="pick-l"><input type="checkbox" data-pick="${esc(e.toLowerCase())}"><span class="val">${esc(e)}</span></label><button class="mini copy" data-copy="${esc(e)}">Copy</button></div>`).join('')}
     ${phoneLines}
     ${x.cm ? `<div class="k-note">${markText(x.cm)}</div>` : ''}
     ${meta ? `<div class="k-meta">${esc(meta)}</div>` : ''}
@@ -230,6 +258,7 @@ function card(x){
    ===================================================================== */
 let dMode = 'cap', dCap = 'Pack', dTypeCap = 'All';
 const dChosen = new Set(['Escalation Contact']);
+const dAdd = new Set();          // step 2: extra service types to add at the step-1 carriers
 const dSel = {mode: 'excl', set: new Set()};   // excl = all except set; incl = only set (after Clear)
 let dOpen = false;
 const isOnD = s => dSel.mode === 'excl' ? !dSel.set.has(s) : dSel.set.has(s);
@@ -242,6 +271,7 @@ document.querySelectorAll('#distroMode button').forEach(b => b.onclick = () => {
 chipGroup('dCap', v => { dCap = v; resetSel(); renderDistro(); });
 chipGroup('dTypeCap', v => { dTypeCap = v; renderDistro(); });
 $('dIncBoth').onchange = renderDistro;
+$('dKeep1').onchange = renderDistro;
 function capMatch(rowCap, cap, incBoth){
   if(cap === 'All') return true;
   if(cap === 'Both') return rowCap === 'Both';
@@ -249,7 +279,7 @@ function capMatch(rowCap, cap, incBoth){
 }
 function buildTypeChips(){
   const all = [...new Set(DATA.flatMap(c => c.contacts.flatMap(x => x.st)))].sort().concat([NO_TYPE]);
-  [...dChosen].forEach(t => { if(!all.includes(t)) dChosen.delete(t); });
+  if(DATA.length) [...dChosen].forEach(t => { if(!all.includes(t)) dChosen.delete(t); });
   const cnt = {}; DATA.forEach(c => c.contacts.forEach(x => { if(x.e.length) typesOf(x).forEach(t => cnt[t] = (cnt[t] || 0) + 1); }));
   $('dTypes').innerHTML = all.map(t => { const f = typeFlag(t); return `<button class="chip ${f ? 't-' + FLAG_CLASS[f.key] : ''} ${dChosen.has(t) ? 'on' : ''}" data-t="${esc(t)}">${esc(t)}<span class="n">${cnt[t] || 0}</span></button>`; }).join('');
   $('dTypes').querySelectorAll('.chip').forEach(b => b.onclick = () => {
@@ -257,22 +287,52 @@ function buildTypeChips(){
     b.classList.toggle('on'); renderDistro();
   });
 }
+function renderAddChips(base){
+  const all = [...new Set(DATA.flatMap(c => c.contacts.flatMap(x => x.st)))].sort().concat([NO_TYPE]);
+  if(DATA.length) [...dAdd].forEach(t => { if(!all.includes(t)) dAdd.delete(t); });
+  const cnt = {};
+  base.forEach(g => all.forEach(t => { const n = uniqEmails(g.c.contacts.filter(x => typesOf(x).includes(t))).length; if(n) cnt[t] = (cnt[t] || 0) + n; }));
+  $('dAdd').innerHTML = all.map(t => { const f = typeFlag(t); return `<button class="chip ${f ? 't-' + FLAG_CLASS[f.key] : ''} ${dAdd.has(t) ? 'on' : ''} ${cnt[t] ? '' : 'empty'}" data-t="${esc(t)}">${dAdd.has(t) ? '+ ' : ''}${esc(t)}<span class="n">${cnt[t] || 0}</span></button>`; }).join('');
+  $('dAdd').querySelectorAll('.chip').forEach(b => b.onclick = () => {
+    dAdd.has(b.dataset.t) ? dAdd.delete(b.dataset.t) : dAdd.add(b.dataset.t); renderDistro();
+  });
+}
 function renderDistro(){
   const out = $('distroOut');
+  $('dFloat').hidden = !DATA.length;
   if(!DATA.length){ out.innerHTML = `<div class="small">Upload the contact list first (Update tab).</div>`; return; }
   const filt = dMode === 'cap'
     ? x => capMatch(x.cap, dCap, $('dIncBoth').checked)
     : x => typesOf(x).some(t => dChosen.has(t)) && capMatch(x.cap, dTypeCap, true);
   $('dIncBoth').disabled = dCap === 'All' || dCap === 'Both';
-  const groups = DATA.map(c => ({c, em: uniqEmails(c.contacts.filter(filt))})).filter(g => g.em.length);
+  // Step 1 decides the carrier base; step 2 adds other service types from those same carriers.
+  const keep1 = $('dKeep1').checked;
+  const addMatch = x => typesOf(x).some(t => dAdd.has(t));
+  const base = DATA.map(c => ({c, em1: uniqEmails(c.contacts.filter(filt))})).filter(g => g.em1.length);
+  const groups = base.map(g => {
+    const em2 = dAdd.size ? uniqEmails(g.c.contacts.filter(addMatch)) : [];
+    const em = [...new Set([...(keep1 ? g.em1 : []), ...em2])];
+    return {...g, em2, em};
+  }).filter(g => g.em.length);
+  renderAddChips(base);
+  $('step2Note').innerHTML = base.length
+    ? `Step 1 found <b>${plural(base.length, 'carrier')}</b>. Pick service types to add their contacts at just those carriers.`
+    : 'Pick something in step 1 first.';
   const draw = () => {
     const on = groups.filter(g => isOnD(g.c.scac));
     const em = [...new Set(on.flatMap(g => g.em))];
-    out.querySelector('.count').innerHTML = `<b>${em.length}</b> email${em.length === 1 ? "" : "s"} · <b>${on.length}</b> of ${groups.length} carriers`;
+    const s1 = new Set(keep1 ? on.flatMap(g => g.em1) : []);
+    const added = em.filter(e => !s1.has(e)).length;
+    out.querySelector('.count').innerHTML = `<b>${em.length}</b> email${em.length === 1 ? "" : "s"} · <b>${on.length}</b> of ${groups.length} carriers`
+      + (dAdd.size ? `<div class="breakdown">${keep1 ? `${s1.size} from step 1 + ` : ''}${added} added (${[...dAdd].map(esc).join(', ')})</div>` : '');
     const cb = out.querySelector('#dCopy'); cb.disabled = !em.length; cb.textContent = `📋 Copy ${plural(em.length, 'email')}`;
     cb.onclick = () => copyText(em.join('; '), `Copied ${plural(em.length, 'email')} — paste into Outlook (BCC)`);
     const mb = out.querySelector('#dMail'); if(em.length) mb.setAttribute('href', mailto(em, true)); else mb.removeAttribute('href');
     out.querySelector('textarea').value = em.join('; ');
+    // pinned copy bar (always reachable without scrolling)
+    $('dFloatCount').innerHTML = `<b>${em.length}</b> email${em.length === 1 ? '' : 's'}<br><span>${plural(on.length, 'carrier')}</span>`;
+    const fb = $('dFloatCopy'); fb.disabled = !em.length; fb.textContent = `📋 Copy ${em.length}`;
+    fb.onclick = cb.onclick;
   };
   out.innerHTML = `
     <div class="count"></div>
