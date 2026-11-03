@@ -1,4 +1,4 @@
-# Gaspari Transport Contacts
+# Gimmick Contacts
 
 An Android app for looking up Shell carrier contacts on the go and building email distribution lists, built from the **Shell Carrier Contact List** master `.xlsx`.
 

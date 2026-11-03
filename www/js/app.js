@@ -1,5 +1,5 @@
 'use strict';
-/* Gaspari Transport Contacts — phone-first lookup of Shell carrier contacts.
+/* Gimmick Contacts — phone-first lookup of Shell carrier contacts.
    Data comes only from the contact-list .xlsx the user uploads; it is kept in this
    device's local storage (nothing is bundled in the app or sent anywhere). */
 
@@ -64,7 +64,7 @@ const PHONE_RE = /(?:\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}(?:\s*(?:ex
 function setTop(){
   const inDetail = !!current && $('v-lookup').classList.contains('on');
   $('backBtn').hidden = !inDetail;
-  $('topTitle').textContent = inDetail ? current.name : 'Gaspari Transport Contacts';
+  $('topTitle').textContent = inDetail ? current.name : 'Gimmick Contacts';
   $('topLogo').hidden = inDetail;
   const n = DATA.reduce((a, c) => a + c.contacts.length, 0);
   $('topSub').textContent = inDetail ? current.scac

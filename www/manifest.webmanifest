@@ -1,6 +1,6 @@
 {
-  "name": "Gaspari Transport Contacts",
-  "short_name": "Gaspari Contacts",
+  "name": "Gimmick Contacts",
+  "short_name": "Gimmick Contacts",
   "description": "Look up Shell carrier contacts and build email distribution lists.",
   "start_url": "./",
   "scope": "./",
