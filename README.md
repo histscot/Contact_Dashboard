@@ -21,7 +21,7 @@ Every push to `main` builds a new APK automatically (**Actions → Build Android
 
 - **Lookup**: search by carrier name or SCAC, or tap a recent carrier. Each carrier has:
   - a big **Copy emails** button (semicolon-separated, ready to paste into Outlook) and an **Email** button
-  - a **Copy** button next to every email address and a **Call** button for every phone number
+  - a **Copy** button next to every email address, and **Copy** and **Call** buttons for every phone number
   - service-type filter chips
   - a checkbox next to every email address: tick the ones you want and the big button copies **only those** (**Select all shown** works with the service-type filter, so you can tick Safety contacts, switch to Escalation and add more)
 - **Distros**: build an email list in steps:

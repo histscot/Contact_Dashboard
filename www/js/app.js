@@ -237,8 +237,8 @@ function card(x){
   const types = x.st.length ? x.st.map(t => { const f = typeFlag(t); return `<span class="tchip ${f ? FLAG_CLASS[f.key] : ''}">${esc(t)}</span>`; }).join('') : `<span class="tchip none">${NO_TYPE}</span>`;
   const phones = x.p ? (x.p.match(PHONE_RE) || []) : [];
   const phoneLines = !x.p ? '' : phones.length
-    ? phones.map(ph => `<div class="line"><span class="val plain">${esc(phones.length === 1 ? x.p : ph)}</span><a class="mini" href="tel:${esc(ph.replace(/\s*(ext\.?|x)\s*\d+$/i, '').replace(/[^\d+]/g, ''))}">📞 Call</a></div>`).join('')
-    : `<div class="line"><span class="val plain">${esc(x.p)}</span></div>`;
+    ? phones.map(ph => `<div class="line phone"><span class="val plain">${esc(phones.length === 1 ? x.p : ph)}</span><button class="mini copy" data-copy="${esc(ph.trim())}">Copy</button><a class="mini" href="tel:${esc(ph.replace(/\s*(ext\.?|x)\s*\d+$/i, '').replace(/[^\d+]/g, ''))}">📞 Call</a></div>`).join('')
+    : `<div class="line phone"><span class="val plain">${esc(x.p)}</span><button class="mini copy" data-copy="${esc(x.p)}">Copy</button></div>`;
   const meta = [x.cap && `Capability: ${x.cap}`, x.live && `Live: ${x.live}`, x.cad && `Cadence: ${x.cad}`].filter(Boolean).join(' · ');
   return `<div class="card${cls}">
     ${flagChips ? `<div class="flags">${flagChips}</div>` : ''}

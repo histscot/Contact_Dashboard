@@ -184,3 +184,5 @@ mark.hl.yellow{background:#ffe766} mark.hl.red{background:#ffc9c5} mark.hl.purpl
 .float-copy .btn{min-height:50px;padding:0 22px}
 #v-distro{padding-bottom:84px}
 #v-distro:not(.on) .float-copy{display:none}
+.line.phone .mini{min-width:68px}
+.line.phone .mini.copy{min-width:64px}
